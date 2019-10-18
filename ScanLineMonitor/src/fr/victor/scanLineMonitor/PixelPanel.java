@@ -5,7 +5,7 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-public class PixelPanel extends JPanel{
+public class PixelPanel extends JPanel implements DataObserver{
 	
 	//px
 	public static final int width = 1000;
@@ -53,6 +53,17 @@ public class PixelPanel extends JPanel{
 			g.drawLine((int)(i*step), 0, (int)(i*step), this.getHeight());
 		}
 		
+	}
+	
+	@Override
+	public void notifyPortClosed(DataFetcher data, String name) {}
+
+	@Override
+	public void notifyPortOpenned(DataFetcher data, String name) {}
+
+	@Override
+	public void notifyDataUpdated(DataFetcher data) {
+		this.repaint();
 	}
 	
 }

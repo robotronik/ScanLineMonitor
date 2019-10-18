@@ -11,6 +11,7 @@ public class WindowSL extends JFrame{
 	
 	protected SerialPanel serialPan;
 	protected PixelPanel pixPan;
+	protected ConsolePanel consolePan;
 	
 	public WindowSL(){
 			
@@ -18,11 +19,12 @@ public class WindowSL extends JFrame{
 			this.setBackground(Color.white);
 			this.setLocationRelativeTo(null);
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			this.setSize(1000,600);
+			this.setSize(1000,750);
 			
-			Monitor.dataFetch = new DataFetcher();
-			this.serialPan = new SerialPanel(Monitor.dataFetch);
+			this.serialPan = new SerialPanel();
 			this.pixPan = new PixelPanel(Monitor.dataFetch);
+			this.consolePan = new ConsolePanel();
+			
 			Monitor.dataFetch.addDataObserver((DataObserver)this.pixPan);
 			
 			this.mainPanel = new JPanel();
@@ -31,9 +33,14 @@ public class WindowSL extends JFrame{
 			
 			this.mainPanel.add(this.serialPan, BorderLayout.NORTH);
 			this.mainPanel.add(this.pixPan, BorderLayout.CENTER);
+			this.mainPanel.add(this.consolePan, BorderLayout.SOUTH);
 			
 			this.setContentPane(this.mainPanel);
 			this.setVisible(true);
+	}
+	
+	public void print(String str){
+		this.consolePan.addToDisplay(str);
 	}
 	
 }
