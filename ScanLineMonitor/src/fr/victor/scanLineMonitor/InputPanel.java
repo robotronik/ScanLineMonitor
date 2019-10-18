@@ -17,7 +17,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class SerialPanel extends JPanel{
+public class InputPanel extends JPanel{
 
 	
 	//Serial part
@@ -32,7 +32,7 @@ public class SerialPanel extends JPanel{
 	private JButton openFile = new JButton("Open file");
 	private JButton saveFile = new JButton("Save file");
 	
-	public SerialPanel(){
+	public InputPanel(){
 		
 		this.loadPortName();
 		this.initPanel();
@@ -73,15 +73,15 @@ public class SerialPanel extends JPanel{
 		this.refresh.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				SerialPanel.this.loadPortName();
-				SerialPanel.this.repaint();
+				InputPanel.this.loadPortName();
+				InputPanel.this.repaint();
 			}
 		});
 		
 		this.open.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(Monitor.dataFetch.loadData(SerialPanel.this.ports.getSelectedIndex()-1))
+				if(Monitor.dataFetch.loadData(InputPanel.this.ports.getSelectedIndex()-1))
 					Monitor.printGlobal("Port opened successfully");
 				else
 					Monitor.printGlobal("Unable to open the port");

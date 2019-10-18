@@ -9,7 +9,7 @@ public class WindowSL extends JFrame{
 	
 	private JPanel mainPanel;
 	
-	protected SerialPanel serialPan;
+	protected InputPanel inputPan;
 	protected PixelPanel pixPan;
 	protected ConsolePanel consolePan;
 	
@@ -21,7 +21,7 @@ public class WindowSL extends JFrame{
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			this.setSize(1000,750);
 			
-			this.serialPan = new SerialPanel();
+			this.inputPan = new InputPanel();
 			this.pixPan = new PixelPanel(Monitor.dataFetch);
 			this.consolePan = new ConsolePanel();
 			
@@ -31,7 +31,7 @@ public class WindowSL extends JFrame{
 			this.mainPanel.setBackground(Color.white);
 			this.mainPanel.setLayout(new BorderLayout());
 			
-			this.mainPanel.add(this.serialPan, BorderLayout.NORTH);
+			this.mainPanel.add(this.inputPan, BorderLayout.NORTH);
 			this.mainPanel.add(this.pixPan, BorderLayout.CENTER);
 			this.mainPanel.add(this.consolePan, BorderLayout.SOUTH);
 			
