@@ -18,22 +18,12 @@ public class DataFetcher{
 
 	public static final String fileName = "debug.txt";
 	
-	protected ComPanel comPan;
-	protected PixelPanel pixPan;
-	
-	private int[] data = new int[128];
-	//public static ArrayList<Integer> dataReg = new ArrayList<Integer>();
-	//coef pour reg
-	private double a=1;
-	private double x0 = 64;
-	private double b;
-	private double c;
-	
+	protected int[] data = new int[128];
+	protected ArrayList<DataObserver> observers = new ArrayList<DataObserver>();
 	Thread thread;
-	Thread mainThread;
+	
 	SerialPort[] ports;
 	SerialPort serialPort;
-	//private int dataSelector = 0;//-1: fichier, sinon index
 	
 	public DataFetcher(){
 		
@@ -41,7 +31,6 @@ public class DataFetcher{
 		for(int i=0; i<128; i++)
 			data[i] = 100*i/128;
 		
-		this.mainThread = Thread.currentThread();
 		this.ports = SerialPort.getCommPorts();
 	    
 	}//fin constructeur
@@ -66,7 +55,9 @@ public class DataFetcher{
 				 }
 			}
 			//*/
-			this.pixPan.repaint();
+			this.notifyObserversDataUpdated(this.serialPort.getSystemPortName());
+			
+			
 			return true;
 		} catch (IOException e) {
 			System.out.println("DataFetcher] Erreur lecture debug.txt");
@@ -78,10 +69,10 @@ public class DataFetcher{
 	
 	public boolean loadData(int id){
 		if(id <0){
-			this.pixPan.repaint();
+			this.notifyObserversDataUpdated(this.serialPort.getSystemPortName());
 			return this.loadFromDebugFile();
 		}else{
-			this.pixPan.repaint();
+			this.notifyObserversDataUpdated(this.serialPort.getSystemPortName());
 			return this.openPortAndLoad(id);
 		}	
 	}
@@ -100,6 +91,7 @@ public class DataFetcher{
 			//start
 			this.thread = new ScanThread();
 			this.thread.start();
+			this.notifyObserversPortOpenned(this.serialPort.getSystemPortName());
 			return true;
 		}
 		else{
@@ -141,54 +133,16 @@ public class DataFetcher{
 				for(int i=0; i<this.data.length; i++) {
 					this.data[i] = values[i];
 				}
-				this.pixPan.repaint();
+				this.notifyObserversDataUpdated(this.serialPort.getSystemPortName());
 			}
 		}catch(Exception e) {}
-		
-		/*/ancienne version text
-		Scanner scanner = new Scanner(DataFetcher.this.serialPort.getInputStream());
-		//int[] values = new int[128];
-		int[] bufferScan = new int[256];
-		
-		System.out.println("acquire");
-		
-		try {
-			//scanning:
-			for(int s=0; s<bufferScan.length; s++) {
-				while(!scanner.hasNext()){};//attente
-				bufferScan[s] = scanner.nextInt();//enregistre
-			}
-			System.out.println("Buffer: ");
-			for(int i=0; i<bufferScan.length; i++)
-				System.out.print(bufferScan[i]+" ");
-			//detection debut trame:
-			int debut=0;
-			for(int j=0; j<bufferScan.length; j++){
-				if(bufferScan[j] == -1) {
-					debut=j+1;
-					break;
-				}
-			}
-			//transfert
-			for(int i=0; i<data.length; i++) {
-				data[i] = bufferScan[debut+i];
-			}
-			//Affichage
-			System.out.println("\nValues: ");
-			for(int i=0; i<data.length; i++)
-				System.out.print(data[i]+" ");
-			this.notifyObserver();
-		}catch(Exception e) {};
-		//*/
-	}
-	
-	public void computeReg(){
 		
 	}
 	
 	public void closePort(){
 		if(this.serialPort != null) {
 			this.serialPort.closePort();
+			this.notifyObserversPortClosed(this.serialPort.getSystemPortName());
 			this.serialPort = null;
 		}
 	}
@@ -209,9 +163,31 @@ public class DataFetcher{
 		return this.data;
 	}
 	
-	public void setPixelPanel(PixelPanel p) {
-		this.pixPan = p;
+	//---------------------------------- Observers ----------------------------------
+	protected void addDataObserver(DataObserver obs){
+		this.observers.add(obs);
 	}
+	
+	protected void removeDataObserver(DataObserver obs){
+		this.observers.remove(obs);
+	}
+	
+	protected void notifyObserversPortOpenned(String name){
+		for(DataObserver obs : this.observers)
+			obs.notifyPortOpenned(this, name);
+	}
+	
+	protected void notifyObserversPortClosed(String name){
+		for(DataObserver obs : this.observers)
+			obs.notifyPortClosed(this, name);
+	}
+	
+	protected void notifyObserversDataUpdated(String portName){
+		for(DataObserver obs : this.observers)
+			obs.notifyDataUpdated(this);
+	}
+	
+	//---------------------------------- Thread ----------------------------------
 
 	private class ScanThread extends Thread{
 		
@@ -241,7 +217,7 @@ public class DataFetcher{
 							//System.out.print(values[i]+" ");
 						}
 						//System.out.print("\n");
-						DataFetcher.this.pixPan.repaint();
+						DataFetcher.this.notifyObserversDataUpdated(DataFetcher.this.serialPort.getSystemPortName());
 					}
 				}catch(Exception e) {
 				};

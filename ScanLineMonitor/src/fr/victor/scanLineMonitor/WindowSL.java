@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 public class WindowSL extends JFrame{
 	
 	private JPanel mainPanel;
-	protected DataFetcher dataFetch;
-	protected ComPanel comPan;
+	
+	protected SerialPanel serialPan;
 	protected PixelPanel pixPan;
 	
 	public WindowSL(){
@@ -20,16 +20,16 @@ public class WindowSL extends JFrame{
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			this.setSize(1000,600);
 			
-			dataFetch = new DataFetcher();
-			this.comPan = new ComPanel(this.dataFetch);
-			this.pixPan = new PixelPanel(this.dataFetch);
-			this.dataFetch.setPixelPanel(this.pixPan);;
+			Monitor.dataFetch = new DataFetcher();
+			this.serialPan = new SerialPanel(Monitor.dataFetch);
+			this.pixPan = new PixelPanel(Monitor.dataFetch);
+			Monitor.dataFetch.addDataObserver((DataObserver)this.pixPan);
 			
 			this.mainPanel = new JPanel();
 			this.mainPanel.setBackground(Color.white);
 			this.mainPanel.setLayout(new BorderLayout());
 			
-			this.mainPanel.add(this.comPan, BorderLayout.NORTH);
+			this.mainPanel.add(this.serialPan, BorderLayout.NORTH);
 			this.mainPanel.add(this.pixPan, BorderLayout.CENTER);
 			
 			this.setContentPane(this.mainPanel);
